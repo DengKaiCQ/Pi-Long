@@ -25,6 +25,8 @@ As can be seen from the experiments, `Pi-Long`, implemented based on `Pi3`, exhi
 
 ### **Updates**
 
+`[TO BE DONE]` There are a lot changes in repo of `VGGT-Long`. Will sync them to this repo.
+
 `[04 Sep 2025]` Code of `Pi-Long` release.
 
 ##  Setup, Installation & Running
