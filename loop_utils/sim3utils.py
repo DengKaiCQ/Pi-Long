@@ -289,39 +289,107 @@ def save_confident_pointcloud_batch(points, colors, confs, output_path, conf_thr
                     remaining_pts = valid_pts[fill_count:]
                     remaining_cls = valid_cls[fill_count:]
                     
-                    count, reservoir_pts, reservoir_clr = vectorized_reservoir_sampling(
+                    count, reservoir_pts, reservoir_clr = optimized_vectorized_reservoir_sampling(
                         remaining_pts, remaining_cls, count, reservoir_pts, reservoir_clr
                     )
             else:
-                count, reservoir_pts, reservoir_clr = vectorized_reservoir_sampling(
+                count, reservoir_pts, reservoir_clr = optimized_vectorized_reservoir_sampling(
                     valid_pts, valid_cls, count, reservoir_pts, reservoir_clr
                 )
         
         save_ply(reservoir_pts, reservoir_clr, output_path)
 
-def vectorized_reservoir_sampling(new_pts, new_cls, current_count, reservoir_pts, reservoir_clr):
+### ========= ###
+
+''' The following function is deprecated'''
+
+# def vectorized_reservoir_sampling(new_pts, new_cls, current_count, reservoir_pts, reservoir_clr):
+#     """
+#     - new_pts:  (M, 3)
+#     - new_cls:  (M, 3)
+#     - current_count
+#     - reservoir_pts:  (K, 3)
+#     - reservoir_clr:  (K, 3)
+    
+#     """
+#     k = len(reservoir_pts)
+#     n_new = len(new_pts)
+    
+#     rand_indices = np.random.randint(0, current_count + n_new, size=n_new)
+    
+#     replace_mask = rand_indices < k
+#     replace_indices = rand_indices[replace_mask]
+#     replace_pts = new_pts[replace_mask]
+#     replace_cls = new_cls[replace_mask]
+    
+#     reservoir_pts[replace_indices] = replace_pts
+#     reservoir_clr[replace_indices] = replace_cls
+    
+#     return current_count + n_new, reservoir_pts, reservoir_clr
+
+### ========= ###
+
+
+'''
+    Function `vectorized_reservoir_sampling`  is not mathematically accurate in sampling.
+    This leads to inconsistent density in the downsampled point clouds. 
+    The `optimized_vectorized_reservoir_sampling` function has fixed this bug.
+
+    Special thanks to @Horace89 for the detailed analysis and code assistance.
+
+    See https://github.com/DengKaiCQ/VGGT-Long/issues/28 for details
+'''
+
+def optimized_vectorized_reservoir_sampling(
+    new_points: np.ndarray,
+    new_colors: np.ndarray,
+    current_count: int, 
+    reservoir_points: np.ndarray,
+    reservoir_colors: np.ndarray
+) -> tuple[int, np.ndarray, np.ndarray]:
     """
-    - new_pts:  (M, 3)
-    - new_cls:  (M, 3)
-    - current_count
-    - reservoir_pts:  (K, 3)
-    - reservoir_clr:  (K, 3)
+    Optimized vectorized reservoir sampling with batch probability calculations.
     
+    This maintains mathematical correctness while improving performance through
+    vectorized operations where possible.
+    
+    Args:
+        new_points: New point coordinates to consider, shape (M, 3)
+        new_colors: New point colors to consider, shape (M, 3)
+        current_count: Number of elements seen so far  
+        reservoir_points: Current reservoir of sampled points, shape (K, 3)
+        reservoir_colors: Current reservoir of sampled colors, shape (K, 3)
+        
+    Returns:
+        Tuple of (updated_count, updated_reservoir_points, updated_reservoir_colors)
     """
-    k = len(reservoir_pts)
-    n_new = len(new_pts)
+    random_gen = np.random
+        
+    reservoir_size = len(reservoir_points)
+    num_new_points = len(new_points)
     
-    rand_indices = np.random.randint(0, current_count + n_new, size=n_new)
+    if num_new_points == 0:
+        return current_count, reservoir_points, reservoir_colors
     
-    replace_mask = rand_indices < k
-    replace_indices = rand_indices[replace_mask]
-    replace_pts = new_pts[replace_mask]
-    replace_cls = new_cls[replace_mask]
+    # Calculate sequential indices for each new point
+    point_indices = np.arange(current_count + 1, current_count + num_new_points + 1)
     
-    reservoir_pts[replace_indices] = replace_pts
-    reservoir_clr[replace_indices] = replace_cls
+    # Generate random numbers for each point
+    random_values = random_gen.randint(0, point_indices, size=num_new_points)
     
-    return current_count + n_new, reservoir_pts, reservoir_clr
+    # Determine which points should replace reservoir elements
+    replacement_mask = random_values < reservoir_size
+    replacement_positions = random_values[replacement_mask]
+    
+    # Apply replacements
+    if np.any(replacement_mask):
+        points_to_replace = new_points[replacement_mask]
+        colors_to_replace = new_colors[replacement_mask]
+        
+        reservoir_points[replacement_positions] = points_to_replace
+        reservoir_colors[replacement_positions] = colors_to_replace
+    
+    return current_count + num_new_points, reservoir_points, reservoir_colors
 
 def write_ply_header(f, num_vertices):
     header = [
