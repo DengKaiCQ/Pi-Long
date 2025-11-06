@@ -2,12 +2,13 @@
 <p align="center">
 <h1 align="center">Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the  Framework of VGGT-Long</h1>
 </p>
-
+      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long Paper</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3 Paper</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a>YouTube</a></h4></strong>
+  </strong>
 
 
 https://github.com/user-attachments/assets/cb015a2f-538d-4f43-8b8f-1e1aa0503c11
 
-(For full 60s video, please visit RedNote or YouTube)
+(For the full 60s-1440p-60hz video demo, please visit RedNote or YouTube. YouTube video is uploading, will be done asap)
 
 We received some feedback suggesting that `VGGT-Long`, as a lightweight extension method, can be easily migrated to other methods, such as `Pi3`. We found this to be an excellent idea, and as an extension method, compatibility with similar methods should indeed be one of its key features. The `Pi-Long` project is built on this background. The goals of this project are:
 
@@ -24,9 +25,9 @@ As can be seen from the experiments, `Pi-Long`, implemented based on `Pi3`, exhi
 
 `Pi-Long` **is not accompanied by a dedicated paper**. This repository is built on the [VGGT-Long](https://github.com/DengKaiCQ/VGGT-Long) and [Pi3](https://github.com/yyfz/Pi3). So if you need the technical details of `Pi-Long`, please refer to the following two papers:
 
-[VGGT-Long: Chunk it, Loop it, Align it -- Pushing VGGT's Limits on Kilometer-scale Long RGB Sequences](https://arxiv.org/abs/2507.16443)
+[VGGT-Long: Chunk it, Loop it, Align it, Pushing VGGT's Limits on Kilometer-scale Long RGB Sequences](https://arxiv.org/abs/2507.16443)
 
-[$\pi^3$: Scalable Permutation-Equivariant Visual Geometry Learning](https://arxiv.org/abs/2507.13347)
+[Pi3: Scalable Permutation-Equivariant Visual Geometry Learning](https://arxiv.org/abs/2507.13347)
 
 
 ### **Updates**
