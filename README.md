@@ -3,6 +3,12 @@
 <h1 align="center">Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the  Framework of VGGT-Long</h1>
 </p>
 
+
+
+https://github.com/user-attachments/assets/cb015a2f-538d-4f43-8b8f-1e1aa0503c11
+
+(For full 60s video, please visit RedNote or YouTube)
+
 We received some feedback suggesting that `VGGT-Long`, as a lightweight extension method, can be easily migrated to other methods, such as `Pi3`. We found this to be an excellent idea, and as an extension method, compatibility with similar methods should indeed be one of its key features. The `Pi-Long` project is built on this background. The goals of this project are:
 
 1. To provide a practical example of migrating `VGGT-Long` to other similar methods like `Pi3`;
