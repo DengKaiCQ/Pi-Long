@@ -2,7 +2,7 @@
 <p align="center">
 <h1 align="center">Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the  Framework of VGGT-Long</h1>
 </p>
-      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long Paper</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3 Paper</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a>YouTube</a></h4></strong>
+      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a>YouTube</a></h4></strong>
   </strong>
 
 
