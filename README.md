@@ -151,6 +151,13 @@ or
 python pi_long.py --image_dir ./path_of_images --config ./configs/base_config.yaml
 ```
 
+You may run the following cmd if you got videos before `python pi_long.py`.
+
+```
+mkdir ./extract_images
+ffmpeg -i your_video.mp4 -vf "fps=5,scale=640:-1" ./extract_images/frame_%06d.png
+```
+
 **Note on Space Requirements**: Just the same as `VGGT-Long`, please ensure your machine has sufficient disk space before running the code for `Pi-Long`. When finishing, the code will delete these intermediate results to prevent excessive disk usage.
 
 ## Acknowledgements
