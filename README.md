@@ -192,6 +192,18 @@ If you use this repository in your academic project, please cite both of the two
 }
 ```
 
+Meanwhile, you may cite this repository:
+
+```
+@misc{pilongcode2025,
+  title = {Pi-Long: Extending Pi3's Capabilities on Kilometer-scale with the Framework of VGGT-Long},
+  author = {{VGGT-Long Authors} and {Pi3 Authors}},
+  howpublished = {\url{https://github.com/DengKaiCQ/Pi-Long}},
+  year = {2025},
+  note = {GitHub repository}
+}
+```
+
 ## License
 
 Both [VGGT-Long](https://github.com/DengKaiCQ/VGGT-Long) and [Pi3](https://github.com/yyfz/Pi3) are developed based on [VGGT](https://github.com/facebookresearch/vggt). Therefore the `Pi-Long` codebase follows `VGGT`'s license, please refer to `./LICENSE.txt` for applicable terms.
