@@ -196,7 +196,7 @@ Meanwhile, you may cite this repository:
 
 ```
 @misc{pilongcode2025,
-  title = {Pi-Long: Extending Pi3's Capabilities on Kilometer-scale with the Framework of VGGT-Long},
+  title = {Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the Framework of VGGT-Long},
   author = {{VGGT-Long Authors} and {Pi3 Authors}},
   howpublished = {\url{https://github.com/DengKaiCQ/Pi-Long}},
   year = {2025},
