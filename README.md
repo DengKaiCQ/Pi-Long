@@ -9,6 +9,7 @@
 https://github.com/user-attachments/assets/6075e967-bb0c-449d-9611-6252804894ae
 
 (For the full 60s-1440p-60hz video demo, please visit RedNote or YouTube.)
+</strong>
 
 We received some feedback suggesting that `VGGT-Long`, as a lightweight extension method, can be easily migrated to other methods, such as `Pi3`. We found this to be an excellent idea, and as an extension method, compatibility with similar methods should indeed be one of its key features. The `Pi-Long` project is built on this background. The goals of this project are:
 
