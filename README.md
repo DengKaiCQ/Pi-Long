@@ -2,13 +2,13 @@
 <p align="center">
 <h1 align="center">Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the  Framework of VGGT-Long</h1>
 </p>
-      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a>YouTube</a></h4></strong>
+      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a href="https://youtu.be/dt2L_44_zKQ" target="_blank">YouTube</a>
   </strong>
 
 
-https://github.com/user-attachments/assets/cb015a2f-538d-4f43-8b8f-1e1aa0503c11
+https://github.com/user-attachments/assets/6075e967-bb0c-449d-9611-6252804894ae
 
-(For the full 60s-1440p-60hz video demo, please visit RedNote or YouTube. YouTube video is uploading, will be done asap)
+(For the full 60s-1440p-60hz video demo, please visit RedNote or YouTube.)
 
 We received some feedback suggesting that `VGGT-Long`, as a lightweight extension method, can be easily migrated to other methods, such as `Pi3`. We found this to be an excellent idea, and as an extension method, compatibility with similar methods should indeed be one of its key features. The `Pi-Long` project is built on this background. The goals of this project are:
 
