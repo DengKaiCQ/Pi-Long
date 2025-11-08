@@ -15,7 +15,7 @@ We received some feedback suggesting that `VGGT-Long`, as a lightweight extensio
 
 1. To provide a practical example of migrating `VGGT-Long` to other similar methods like `Pi3`;
 2. `Pi3` is superior to `VGGT` in reconstruction stability, and `Pi-Long` is based on this to explore its performance of `Pi3` at the kilometer scale;
-3. To provide a new baseline to facilitate future research
+3. To provide a new baseline to facilitate future research;
 4. To provide a better method for the community to use;
 
 Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `Pi-Long` was straightforward. We have conducted some experiments on KITTI Odometry as shown in the figure below. The following experiments were all implemented under the same settings, i.e., `Chunk Size = 75`, `Overlap = 30`.
