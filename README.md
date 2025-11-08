@@ -69,7 +69,7 @@ System Environment：
 Creating a virtual environment using conda (or miniconda),
 
 ```cmd
-conda create -n pi-long python=3.10
+conda create -n pi-long python=3.10.18
 conda activate pi-long
 # pip version created by conda: 25.1
 ```
