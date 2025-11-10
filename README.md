@@ -2,7 +2,7 @@
 <p align="center">
 <h1 align="center">Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the  Framework of VGGT-Long</h1>
 </p>
-      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">Pi3</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a href="https://youtu.be/dt2L_44_zKQ" target="_blank">YouTube</a></h4></strong>
+      <strong><h4 align="center"><a href="https://arxiv.org/abs/2507.16443" target="_blank">VGGT-Long</a> | <a href="https://arxiv.org/abs/2507.13347" target="_blank">π³</a> | <a href="http://xhslink.com/o/8NrE3HwLdQ2" target="_blank">RedNote</a> | <a href="https://youtu.be/dt2L_44_zKQ" target="_blank">YouTube</a></h4></strong>
   </strong>
 
 
@@ -24,11 +24,11 @@ Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `
 
 As can be seen from the experiments, `Pi-Long`, implemented based on `Pi3`, exhibits more stable tracking performance in long-sequence outdoor scenarios. Particularly, without relying on the LC module, the performance of `Pi-Long` is significantly higher than that of `VGGT-Long`. Furthermore, since `Pi3` has fewer model parameters, the peak GPU memory consumption of `Pi-Long` is around `13GiB`, while that of `VGGT-Long` under the same settings is `~23GiB`.
 
-`Pi-Long` **is not accompanied by a dedicated paper**. This repository is built on the [VGGT-Long](https://github.com/DengKaiCQ/VGGT-Long) and [Pi3](https://github.com/yyfz/Pi3). So if you need the technical details of `Pi-Long`, please refer to the following two papers:
+`Pi-Long` **is not accompanied by a dedicated paper**. This repository is built on the [VGGT-Long](https://github.com/DengKaiCQ/VGGT-Long) and [π³](https://github.com/yyfz/Pi3). So if you need the technical details of `Pi-Long`, please refer to the following two papers:
 
 [VGGT-Long: Chunk it, Loop it, Align it, Pushing VGGT's Limits on Kilometer-scale Long RGB Sequences](https://arxiv.org/abs/2507.16443)
 
-[Pi3: Scalable Permutation-Equivariant Visual Geometry Learning](https://arxiv.org/abs/2507.13347)
+[π³: Scalable Permutation-Equivariant Visual Geometry Learning](https://arxiv.org/abs/2507.13347)
 
 
 ### **Updates**
@@ -200,7 +200,7 @@ Meanwhile, you may cite this repository:
 ```
 @misc{pilongcode2025,
   title = {Pi-Long: Extending $\pi^3$'s Capabilities on Kilometer-scale with the Framework of VGGT-Long},
-  author = {{VGGT-Long Authors} and {Pi3 Authors}},
+  author = {{VGGT-Long Authors} and {$\pi^3$ Authors}},
   howpublished = {\url{https://github.com/DengKaiCQ/Pi-Long}},
   year = {2025},
   note = {GitHub repository}
