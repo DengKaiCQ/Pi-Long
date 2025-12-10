@@ -482,6 +482,7 @@ class Pi_Long:
                 c2w = chunk_extrinsics[i] # camera pose of Pi3 is C2W while it is W2C in VGGT!
 
                 transformed_c2w = S @ c2w  # Be aware of the left multiplication!
+                transformed_c2w[:3, :3] /= s  # Normalize rotation
 
                 all_poses[idx] = transformed_c2w
 
