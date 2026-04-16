@@ -22,7 +22,9 @@ Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `
 
 **1 - Detailed Experiments of Pose Tracking on KITTI Odometry**
 
-Comparison with VGGT-Long in Sim(3), Pi-Long in Sim(3) and Pi3X-Long in SE(3). Color coding: blue = first, yellow = second, gray = third.
+Comparison with `VGGT-Long` in `Sim(3)`, `Pi-Long` in `Sim(3)` and `Pi3X-Long` in `SE(3)`. 
+
+Colors: blue = first, yellow = second, gray = third.
 
 ![exp1](./assets/pi-long-1.png)
 
