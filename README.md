@@ -49,7 +49,7 @@ Colors: blue = first, yellow = second, gray = third.
 
 ### **Updates**
 
-`[16 Apr 2026]` 1. The Pi3X model was supported; 2. Pi-Long now achieves a running speed of ~18 FPS on KITTI (504x154), by integrating the GPU-accelerated code from DA3-Streaming. 3. Bugs fixed; 4. Readme with detailed experiments.
+`[16 Apr 2026]` 1. The `Pi3X` model was supported; 2. `Pi-Long` now achieves a running speed of `~18 FPS` on KITTI (504x154), by integrating the GPU-accelerated code from `DA3-Streaming`. 3. Bugs fixed; 4. Readme with detailed experiments.
 
 `[06 Nov 2025]` Demo video of `Pi-Long` uploaded.
 
