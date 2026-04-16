@@ -22,13 +22,13 @@ Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `
 
 **1 - Detailed Experiments of Pose Tracking on KITTI Odometry**
 
-![exp1](./assets/Pi-Long-1.png)
-![exp2](./assets/Pi-Long-2.png)
+![exp1](./assets/pi-long-1.png)
+![exp2](./assets/pi-long-2.png)
 
 **2 - Experiments of GPU Memory Usage**
 
-<img src="./assets/Pi-Long-mem-1.png" width="45%" height="auto">
-<img src="./assets/Pi-Long-mem-2.png" width="45%" height="auto">
+<img src="./assets/pi-long-mem-1.png" width="45%" height="auto">
+<img src="./assets/pi-long-mem-2.png" width="45%" height="auto">
 
 
 

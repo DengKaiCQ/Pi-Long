@@ -199,6 +199,8 @@ __pycache__/*
 .vscode/*
 .pyc
 
+.DS_Store
+
 # vggt-long
 /exps/*
 *.ckpt
