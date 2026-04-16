@@ -20,7 +20,7 @@ We received some feedback suggesting that `VGGT-Long`, as a lightweight extensio
 
 Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `Pi-Long` was straightforward. We have conducted some experiments on KITTI Odometry as shown in the figure below. The following experiments were using `Overlap = Chunk Size / 2`.
 
-**1 - Detailed Experiments of Pose Tracking on KITTI Odometry**
+**1 - Detailed Experiments of Pose Tracking on KITTI Odometry (ATE RMSE [m] $\downarrow$)**
 
 Comparison with `VGGT-Long` in `Sim(3)`, `Pi-Long` in `Sim(3)` and `Pi3X-Long` in `SE(3)`. 
 
