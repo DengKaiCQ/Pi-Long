@@ -28,7 +28,7 @@ Colors: blue = first, yellow = second, gray = third.
 
 ![exp1](./assets/pi-long-1.png)
 
-Pi‑Long and Pi3X‑Long under different resolutions and alignment methods.
+`Pi‑Long` and `Pi3X‑Long` under different resolutions and alignment methods.
 
 ![exp2](./assets/pi-long-2.png)
 
