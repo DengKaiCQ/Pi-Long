@@ -32,7 +32,7 @@ Colors: blue = first, yellow = second, gray = third.
 
 ![exp2](./assets/pi-long-2.png)
 
-**2 - Experiments of GPU Memory Usage**
+**2 - Experiments of GPU Memory Usage (Unit: GB)**
 <div align="center">
 <img src="./assets/pi-long-mem-1.png" width="60%" height="auto">
 <img src="./assets/pi-long-mem-2.png" width="60%" height="auto">
