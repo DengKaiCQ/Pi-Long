@@ -20,9 +20,11 @@ We received some feedback suggesting that `VGGT-Long`, as a lightweight extensio
 
 Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `Pi-Long` was straightforward. We have conducted some experiments on KITTI Odometry as shown in the figure below. The following experiments were using `Overlap = Chunk Size / 2`.
 
-**1 - Detailed Experiments of Pose Tracking on KITTI Odometry (Color coding: blue = first, yellow = second, gray = third)**
-
+**1 - Detailed Experiments of Pose Tracking on KITTI Odometry **
+Comparison with VGGT-Long in Sim(3), Pi-Long in Sim(3) and Pi3X-Long in SE(3). Color coding: blue = first, yellow = second, gray = third.
 ![exp1](./assets/pi-long-1.png)
+
+Pi‑Long and Pi3X‑Long under different resolutions and alignment methods.
 ![exp2](./assets/pi-long-2.png)
 
 **2 - Experiments of GPU Memory Usage**
