@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+kitti_sequences_dir="./Datasets/kitti-odometry/dataset/sequences"
+logs_root_dir="${LOGS_DIR:-./logs}"
+run_id="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
+logs_dir="${logs_root_dir}/${run_id}"
+
+mkdir -p "${logs_dir}"
+echo "Logs: ${logs_dir}"
+
+run_group() {
+  local gpu="$1"
+  local config="$2"
+  local exp_folder_name="$3"
+
+  for seq in {00..10}; do
+    CUDA_VISIBLE_DEVICES="${gpu}" python pi_long.py \
+      --image_dir "${kitti_sequences_dir}/${seq}/image_2" \
+      --config "${config}" \
+      --exp_folder_name "${exp_folder_name}"
+  done
+}
+
+pids=()
+
+run_group 0 configs/pi3-se3-120_900px.yaml ./exps_pi3_se3_120_900px >"${logs_dir}/gpu0_pi3-se3-120_900px.log" 2>&1 & pids+=("$!")
+run_group 1 configs/pi3-se3-90_900px.yaml ./exps_pi3_se3_90_900px >"${logs_dir}/gpu1_pi3-se3-90_900px.log" 2>&1 & pids+=("$!")
+run_group 2 configs/pi3-se3-60_900px.yaml ./exps_pi3_se3_60_900px >"${logs_dir}/gpu2_pi3-se3-60_900px.log" 2>&1 & pids+=("$!")
+run_group 3 configs/pi3-se3-30_900px.yaml ./exps_pi3_se3_30_900px >"${logs_dir}/gpu3_pi3-se3-30_900px.log" 2>&1 & pids+=("$!")
+run_group 4 configs/pi3-sim3-120_900px.yaml ./exps_pi3_sim3_120_900px >"${logs_dir}/gpu4_pi3-sim3-120_900px.log" 2>&1 & pids+=("$!")
+run_group 5 configs/pi3-sim3-90_900px.yaml ./exps_pi3_sim3_90_900px >"${logs_dir}/gpu5_pi3-sim3-90_900px.log" 2>&1 & pids+=("$!")
+run_group 6 configs/pi3-sim3-60_900px.yaml ./exps_pi3_sim3_60_900px >"${logs_dir}/gpu6_pi3-sim3-60_900px.log" 2>&1 & pids+=("$!")
+run_group 7 configs/pi3-sim3-30_900px.yaml ./exps_pi3_sim3_30_900px >"${logs_dir}/gpu7_pi3-sim3-30_900px.log" 2>&1 & pids+=("$!")
+
+status=0
+for pid in "${pids[@]}"; do
+  if ! wait "$pid"; then
+    status=1
+  fi
+done
+exit "$status"

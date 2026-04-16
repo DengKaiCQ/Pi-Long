@@ -1,5 +1,5 @@
-from .attention import FlashAttentionRope
-from .block import BlockRope
+from .attention import FlashAttentionRope, FlashCrossAttentionRope
+from .block import BlockRope, CrossOnlyBlockRope
 from ..dinov2.layers import Mlp
 import torch.nn as nn
 from functools import partial
@@ -79,3 +79,65 @@ class LinearPts3d (nn.Module):
 
         # permute + norm depth
         return feat.permute(0, 2, 3, 1)
+    
+
+
+class ContextOnlyTransformerDecoder(nn.Module):
+    def __init__(
+        self,
+        in_dim,
+        out_dim,
+        dec_embed_dim=512,
+        depth=5,
+        dec_num_heads=8,
+        mlp_ratio=4,
+        rope=None,
+        prenorm=False,
+        use_checkpoint=True,
+    ):
+        super().__init__()
+
+        if prenorm:
+            self.pre_norm = nn.LayerNorm(in_dim)
+        else:
+            self.pre_norm = None
+
+        self.projects_x = nn.Linear(in_dim, dec_embed_dim)
+        self.projects_y = nn.Linear(in_dim, dec_embed_dim)
+        self.use_checkpoint = use_checkpoint
+
+        self.blocks = nn.ModuleList([
+            CrossOnlyBlockRope(
+                dim=dec_embed_dim,
+                num_heads=dec_num_heads,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=True,
+                proj_bias=True,
+                ffn_bias=True,
+                norm_layer=partial(nn.LayerNorm, eps=1e-6),
+                act_layer=nn.GELU,
+                ffn_layer=Mlp,
+                init_values=None,
+                qk_norm=False,
+                cross_attn_class=FlashCrossAttentionRope,
+                rope=rope
+            ) for _ in range(depth)])
+
+        self.linear_out = nn.Linear(dec_embed_dim, out_dim)
+
+    def forward(self, hidden, context, xpos=None, ypos=None):
+        if self.pre_norm is not None:
+            hidden = self.pre_norm(hidden)
+            context = self.pre_norm(context)
+
+        hidden = self.projects_x(hidden)
+        context = self.projects_y(context)
+
+        for i, blk in enumerate(self.blocks):
+            if self.use_checkpoint and self.training:
+                hidden = checkpoint(blk, hidden, context, xpos=xpos, ypos=ypos, use_reentrant=False)
+            else:
+                hidden = blk(hidden, context, xpos=xpos, ypos=ypos)
+
+        out = self.linear_out(hidden)
+        return out

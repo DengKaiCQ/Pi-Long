@@ -12,9 +12,6 @@ from .layers.transformer_head import TransformerDecoder, LinearPts3d
 from .layers.camera_head import CameraHead
 from .dinov2.hub.backbones import dinov2_vitl14, dinov2_vitl14_reg
 from huggingface_hub import PyTorchModelHubMixin
-import torch.nn.functional as F
-import itertools
-from typing import Sequence
 
 class Pi3(nn.Module, PyTorchModelHubMixin):
     def __init__(
@@ -181,13 +178,11 @@ class Pi3(nn.Module, PyTorchModelHubMixin):
         
         # encode by dinov2
         imgs = imgs.reshape(B*N, _, H, W)
-        encoder_output = self.encoder(imgs, is_training=True)
-        cls_token = encoder_output["x_norm_clstoken"]  # [B*N, 1024]
+        hidden = self.encoder(imgs, is_training=True)
 
-        if isinstance(encoder_output, dict):
-            hidden = encoder_output["x_norm_patchtokens"]
-            # hidden = hidden["x_norm_patchtokens"]
-            
+        if isinstance(hidden, dict):
+            hidden = hidden["x_norm_patchtokens"]
+
         hidden, pos = self.decode(hidden, N, H, W)
 
         point_hidden = self.point_decoder(hidden, xpos=pos)

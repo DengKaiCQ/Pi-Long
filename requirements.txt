@@ -10,8 +10,13 @@ onnxruntime
 pyparsing
 importlib_metadata
 
-xformers == 0.0.28.post3
-faiss-gpu
+matplotlib
+tqdm
+xformers
+faiss-gpu-cu11
+pandas
+evo==1.14.0
+
 pandas
 prettytable
 pytorch-lightning

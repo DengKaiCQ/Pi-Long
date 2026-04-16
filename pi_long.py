@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 import cv2
 
 import gc
-
+import time 
 try:
     import onnxruntime
 except ImportError:
@@ -20,6 +20,7 @@ from LoopModelDBoW.retrieval.retrieval_dbow import RetrievalDBOW
 # from loop_utils.visual_util import segment_sky, download_file_from_url
 
 from pi3.models.pi3 import Pi3
+from pi3.models.pi3x import Pi3X
 from pi3.utils.basic import load_images_as_tensor, load_images_as_tensor_pi_long
 from pi3.utils.geometry import depth_edge
 
@@ -79,7 +80,9 @@ class Pi_Long:
         self.dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16
         self.sky_mask = False
         self.useDBoW = self.config['Model']['useDBoW']
-
+        self.model_type = self.config['Model']['model_type']
+        self.image_width = self.config['Model']['image_width']
+        
         self.img_dir = image_dir
         self.img_list = None
         self.output_dir = save_dir
@@ -98,7 +101,6 @@ class Pi_Long:
         self.delete_temp_files = self.config['Model']['delete_temp_files']
         self.temp_files_location = self.config['Model']['temp_files_location'] # 'disk' or 'cpu_memory'
         
-        # 初始化用于内存存储的字典
         if self.temp_files_location == 'cpu_memory':
             self.temp_storage = {}
         else:
@@ -106,8 +108,12 @@ class Pi_Long:
 
         print('Loading model...')
 
-        self.model = Pi3().to(self.device).eval()
-        _URL = self.config['Weights']['Pi3']
+        if self.model_type == 'pi3':
+            self.model = Pi3().to(self.device).eval()
+            _URL = self.config['Weights']['pi3']
+        else:
+            self.model = Pi3X().to(self.device).eval()
+            _URL = self.config['Weights']['Pi3X']
         from safetensors.torch import load_file
         weight = load_file(_URL)
         self.model.load_state_dict(weight, strict=False)
@@ -184,7 +190,7 @@ class Pi_Long:
             start_idx, end_idx = range_2
             chunk_image_paths += self.img_list[start_idx:end_idx]
 
-        images = load_images_as_tensor_pi_long(chunk_image_paths).to(self.device)
+        images = load_images_as_tensor_pi_long(chunk_image_paths, self.image_width).to(self.device)
         print(f"Loaded {len(images)} images")
         
         # images: [B, 3, H, W]
@@ -253,6 +259,8 @@ class Pi_Long:
             return predictions if is_loop or range_2 is not None else None
     
     def process_long_sequence(self):
+
+        begin_time = time.time()
         if self.overlap >= self.chunk_size:
             raise ValueError(f"[SETTING ERROR] Overlap ({self.overlap}) must be less than chunk size ({self.chunk_size})")
         if len(self.img_list) <= self.chunk_size:
@@ -331,7 +339,7 @@ class Pi_Long:
 
                 print('chunk_a align')
                 point_map_loop = item[1]['points'][:chunk_a_range[1] - chunk_a_range[0]]
-                conf_loop = item[1]['conf'][:chunk_a_range[1] - chunk_a_range[0]]
+                conf_loop = np.squeeze(item[1]['conf'][:chunk_a_range[1] - chunk_a_range[0]])
                 chunk_a_rela_begin = chunk_a_range[0] - self.chunk_indices[chunk_idx_a][0]
                 chunk_a_rela_end = chunk_a_rela_begin + chunk_a_range[1] - chunk_a_range[0]
                 print(self.chunk_indices[chunk_idx_a])
@@ -344,7 +352,7 @@ class Pi_Long:
                     chunk_data_a = np.load(os.path.join(self.result_unaligned_dir, f"chunk_{chunk_idx_a}.npy"), allow_pickle=True).item()
                 
                 point_map_a = chunk_data_a['points'][chunk_a_rela_begin:chunk_a_rela_end]
-                conf_a = chunk_data_a['conf'][chunk_a_rela_begin:chunk_a_rela_end]
+                conf_a = np.squeeze(chunk_data_a['conf'][chunk_a_rela_begin:chunk_a_rela_end])
             
                 conf_threshold = min(np.median(conf_a), np.median(conf_loop)) * 0.1
                 s_a, R_a, t_a = weighted_align_point_maps(point_map_a, 
@@ -359,7 +367,7 @@ class Pi_Long:
 
                 print('chunk_a align')
                 point_map_loop = item[1]['points'][-chunk_b_range[1] + chunk_b_range[0]:]
-                conf_loop = item[1]['conf'][-chunk_b_range[1] + chunk_b_range[0]:]
+                conf_loop = np.squeeze(item[1]['conf'][-chunk_b_range[1] + chunk_b_range[0]:])
                 chunk_b_rela_begin = chunk_b_range[0] - self.chunk_indices[chunk_idx_b][0]
                 chunk_b_rela_end = chunk_b_rela_begin + chunk_b_range[1] - chunk_b_range[0]
                 print(self.chunk_indices[chunk_idx_b])
@@ -372,7 +380,7 @@ class Pi_Long:
                     chunk_data_b = np.load(os.path.join(self.result_unaligned_dir, f"chunk_{chunk_idx_b}.npy"), allow_pickle=True).item()
                 
                 point_map_b = chunk_data_b['points'][chunk_b_rela_begin:chunk_b_rela_end]
-                conf_b = chunk_data_b['conf'][chunk_b_rela_begin:chunk_b_rela_end]
+                conf_b = np.squeeze(chunk_data_b['conf'][chunk_b_rela_begin:chunk_b_rela_end])
             
                 conf_threshold = min(np.median(conf_b), np.median(conf_loop)) * 0.1
                 s_b, R_b, t_b = weighted_align_point_maps(point_map_b, 
@@ -423,6 +431,9 @@ class Pi_Long:
             save_path = os.path.join(self.output_dir, 'sim3_opt_result.png')
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             plt.close()
+        
+        end_time = time.time()
+        print(f'------> [DEBUG] Loop closure optimization time: {end_time - begin_time}s')
 
         print('Apply alignment')
         self.sim3_list = accumulate_sim3_transforms(self.sim3_list)
@@ -448,7 +459,19 @@ class Pi_Long:
                     chunk_data_first = self.temp_storage[f"chunk_0"]
                 else:
                     chunk_data_first = np.load(os.path.join(self.result_unaligned_dir, f"chunk_0.npy"), allow_pickle=True).item()
-            
+                points = chunk_data_first['points'].reshape(-1, 3)
+                colors = (chunk_data_first['images'].transpose(0, 2, 3, 1).reshape(-1, 3) * 255).astype(np.uint8)
+                confs = chunk_data_first['conf'].reshape(-1)
+                ply_path = os.path.join(self.pcd_dir, f'{chunk_idx}_pcd.ply')
+                save_confident_pointcloud_batch(
+                    points=points,              # shape: (H, W, 3)
+                    colors=colors,              # shape: (H, W, 3)
+                    confs=confs,          # shape: (H, W)
+                    output_path=ply_path,
+                    conf_threshold=np.mean(confs) * self.config['Model']['Pointcloud_Save']['conf_threshold_coef'],
+                    sample_ratio=self.config['Model']['Pointcloud_Save']['sample_ratio']
+                )
+
             if self.temp_files_location == 'cpu_memory':
                 aligned_chunk_data = self.temp_storage[f"chunk_{chunk_idx}"] if chunk_idx > 0 else chunk_data_first
             else:
@@ -457,7 +480,7 @@ class Pi_Long:
             points = aligned_chunk_data['points'].reshape(-1, 3)
             colors = (aligned_chunk_data['images'].transpose(0, 2, 3, 1).reshape(-1, 3) * 255).astype(np.uint8)
             confs = aligned_chunk_data['conf'].reshape(-1)
-            ply_path = os.path.join(self.pcd_dir, f'{chunk_idx}_pcd.ply')
+            ply_path = os.path.join(self.pcd_dir, f'{chunk_idx+1}_pcd.ply')
             save_confident_pointcloud_batch(
                 points=points,              # shape: (H, W, 3)
                 colors=colors,              # shape: (H, W, 3)
@@ -474,8 +497,17 @@ class Pi_Long:
     
     def run(self):
         print(f"Loading images from {self.img_dir}...")
-        self.img_list = sorted(glob.glob(os.path.join(self.img_dir, "*.jpg")) + 
-                                glob.glob(os.path.join(self.img_dir, "*.png")))
+
+        # self.img_list = sorted(glob.glob(os.path.join(self.img_dir, "*.jpg")) + 
+        #                         glob.glob(os.path.join(self.img_dir, "*.png")))
+
+        # https://github.com/DengKaiCQ/VGGT-Long/issues/57
+        pic_patterns = ["*.jpg", "*.JPG", "*.jpeg", "*.JPEG", "*.png", "*.PNG"]
+        self.img_list = []
+        for p in pic_patterns:
+            self.img_list += glob.glob(os.path.join(self.img_dir, p))
+        self.img_list = sorted(self.img_list)
+        
         # print(self.img_list)
         if len(self.img_list) == 0:
             raise ValueError(f"[DIR EMPTY] No images found in {self.img_dir}!")
@@ -635,6 +667,8 @@ if __name__ == '__main__':
                         help='Image path')
     parser.add_argument('--config', type=str, required=False, default='./configs/base_config.yaml',
                         help='Image path')
+    parser.add_argument('--exp_folder_name', type=str, default='./exps',
+                        help='Image path')
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -642,7 +676,7 @@ if __name__ == '__main__':
     image_dir = args.image_dir
     path = image_dir.split("/")
     current_datetime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    exp_dir = './exps'
+    exp_dir = args.exp_folder_name
 
 
     save_dir = os.path.join(

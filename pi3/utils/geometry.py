@@ -5,38 +5,30 @@ import torch.nn.functional as F
 def se3_inverse(T):
     """
     Computes the inverse of a batch of SE(3) matrices.
-    T: Tensor of shape (B, 4, 4)
     """
-    if len(T.shape) == 2:
-        T = T[None]
-        unseq_flag = True
-    else:
-        unseq_flag = False
 
     if torch.is_tensor(T):
-        R = T[:, :3, :3]
-        t = T[:, :3, 3].unsqueeze(-1)
+        R = T[..., :3, :3]
+        t = T[..., :3, 3].unsqueeze(-1)
         R_inv = R.transpose(-2, -1)
         t_inv = -torch.matmul(R_inv, t)
         T_inv = torch.cat([
             torch.cat([R_inv, t_inv], dim=-1),
-            torch.tensor([0, 0, 0, 1], device=T.device, dtype=T.dtype).repeat(T.shape[0], 1, 1)
-        ], dim=1)
+            torch.tensor([0, 0, 0, 1], device=T.device, dtype=T.dtype).repeat(*T.shape[:-2], 1, 1)
+        ], dim=-2)
     else:
-        R = T[:, :3, :3]
-        t = T[:, :3, 3, np.newaxis]
+        R = T[..., :3, :3]
+        t = T[..., :3, 3, np.newaxis]
 
         R_inv = np.swapaxes(R, -2, -1)
         t_inv = -R_inv @ t
 
-        bottom_row = np.zeros((T.shape[0], 1, 4), dtype=T.dtype)
-        bottom_row[:, :, 3] = 1
+        bottom_row = np.zeros((*T.shape[:-2], 1, 4), dtype=T.dtype)
+        bottom_row[..., :, 3] = 1
 
         top_part = np.concatenate([R_inv, t_inv], axis=-1)
-        T_inv = np.concatenate([top_part, bottom_row], axis=1)
+        T_inv = np.concatenate([top_part, bottom_row], axis=-2)
 
-    if unseq_flag:
-        T_inv = T_inv[0]
     return T_inv
 
 def get_pixel(H, W):
@@ -373,3 +365,69 @@ def depth_edge(depth: torch.Tensor, atol: float = None, rtol: float = None, kern
         edge |= (diff / depth).nan_to_num_() > rtol
     edge = edge.reshape(*shape)
     return edge
+
+def recover_intrinsic_from_rays_d(
+    rays_d: torch.Tensor, 
+    ndc_coords: bool = False,
+    force_center_principal_point: bool = False
+):
+    device = rays_d.device
+    dtype = rays_d.dtype
+    
+    *batch_dims, H, W, _ = rays_d.shape
+    num_points = H * W
+
+    grid_y, grid_x = torch.meshgrid(
+        torch.linspace(0, H - 1, H, device=device, dtype=dtype),
+        torch.linspace(0, W - 1, W, device=device, dtype=dtype),
+        indexing="ij" 
+    )
+
+    if ndc_coords:
+        grid_x = grid_x * (2.0 / (W - 1)) - 1.0
+        grid_y = grid_y * (2.0 / (H - 1)) - 1.0
+
+    u_targets = grid_x.reshape(1, num_points).expand(*batch_dims, num_points) # (..., N)
+    v_targets = grid_y.reshape(1, num_points).expand(*batch_dims, num_points) # (..., N)
+
+    z_abs = rays_d[..., 2].abs() + 1e-10 
+    x_projs = (rays_d[..., 0] / z_abs).reshape(*batch_dims, num_points) # (..., N)
+    y_projs = (rays_d[..., 1] / z_abs).reshape(*batch_dims, num_points) # (..., N)
+
+    if force_center_principal_point:
+        if ndc_coords:
+            cx_val, cy_val = 0.0, 0.0
+        else:
+            cx_val, cy_val = (W - 1) / 2.0, (H - 1) / 2.0
+            
+        u_centered = u_targets - cx_val
+        v_centered = v_targets - cy_val
+        
+        fx = (x_projs * u_centered).sum(dim=-1) / (x_projs * x_projs).sum(dim=-1)
+        fy = (y_projs * v_centered).sum(dim=-1) / (y_projs * y_projs).sum(dim=-1)
+        
+        cx = torch.full_like(fx, cx_val)
+        cy = torch.full_like(fy, cy_val)
+        
+    else:
+        def solve_linear_least_squares(X, Y):
+            mean_X = X.mean(dim=-1, keepdim=True)
+            mean_Y = Y.mean(dim=-1, keepdim=True)
+            X_centered = X - mean_X
+            Y_centered = Y - mean_Y
+            
+            a = (X_centered * Y_centered).sum(dim=-1) / (X_centered * X_centered).sum(dim=-1)
+            b = mean_Y.squeeze(-1) - a * mean_X.squeeze(-1)
+            return a, b
+
+        fx, cx = solve_linear_least_squares(x_projs, u_targets)
+        fy, cy = solve_linear_least_squares(y_projs, v_targets)
+
+    K = torch.zeros((*batch_dims, 3, 3), device=device, dtype=dtype)
+    K[..., 0, 0] = fx
+    K[..., 0, 2] = cx
+    K[..., 1, 1] = fy
+    K[..., 1, 2] = cy
+    K[..., 2, 2] = 1.0
+
+    return K

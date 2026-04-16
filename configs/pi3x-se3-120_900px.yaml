@@ -6,17 +6,17 @@ Weights:
   DNIO: './weights/dinov2_vitb14_pretrain.pth'
 
 Model:
-  chunk_size: 60
-  overlap: 30
+  chunk_size: 120
+  overlap: 60
   loop_chunk_size: 20 # imgs of loop chunk = 2 * loop_chunk_size
   loop_enable: True
   useDBoW: False
   delete_temp_files: True
-  temp_files_location: 'disk' # choose between 'disk' or 'cpu_memory'
+  temp_files_location: 'cpu_memory' # choose between 'disk' or 'cpu_memory'
   align_lib: 'torch' # choose among 'triton' (GPU), 'torch' (GPU), 'numba' (CPU) or 'numpy' (CPU)
-  align_method: 'sim3' # choose among 'sim3', 'se3' or 'scale+se3'
-  model_type: 'Pi3' # choose between 'Pi3' and 'Pi3X'
-  image_width: 504 # image_hight will be scaled to image_width, if set to None means PIXEL_LIMIT=255000. See `./pi3/utils/basic.py` line 11 function `load_images_as_tensor_pi_long(...)`
+  align_method: 'se3' # choose among 'sim3', 'se3' or 'scale+se3'
+  model_type: 'Pi3X' # choose between 'Pi3' and 'Pi3X'
+  image_width: -1 # image_hight will be scaled to image_width, if set to None means PIXEL_LIMIT=255000. See `./pi3/utils/basic.py` line 11 function `load_images_as_tensor_pi_long(...)`
   
   IRLS:
     delta: 0.1
@@ -36,7 +36,7 @@ Loop:
   SALAD:
     image_size: [336, 336]
     batch_size: 32
-    similarity_threshold: 0.85 # 0.7 -> 0.85 for more accurate loop detection
+    similarity_threshold: 0.85 # 0.7 -> 0.85 for more accurate  detection
     top_k: 5
     use_nms: True
     nms_threshold: 25

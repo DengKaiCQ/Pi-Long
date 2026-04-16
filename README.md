@@ -18,11 +18,20 @@ We received some feedback suggesting that `VGGT-Long`, as a lightweight extensio
 3. To provide a new baseline to facilitate future research;
 4. To provide a better method for the community to use;
 
-Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `Pi-Long` was straightforward. We have conducted some experiments on KITTI Odometry as shown in the figure below. The following experiments were all implemented under the same settings, i.e., `Chunk Size = 75`, `Overlap = 30`.
+Thanks to the modular code design of `VGGT-Long` and `Pi3`, the development of `Pi-Long` was straightforward. We have conducted some experiments on KITTI Odometry as shown in the figure below. The following experiments were using `Overlap = Chunk Size / 2`.
 
-![overview](./assets/Pi-Long-KITTI.png)
+**1 - Detailed Experiments of Pose Tracking on KITTI Odometry**
 
-As can be seen from the experiments, `Pi-Long`, implemented based on `Pi3`, exhibits more stable tracking performance in long-sequence outdoor scenarios. Particularly, without relying on the LC module, the performance of `Pi-Long` is significantly higher than that of `VGGT-Long`. Furthermore, since `Pi3` has fewer model parameters, the peak GPU memory consumption of `Pi-Long` is around `13GiB`, while that of `VGGT-Long` under the same settings is `~23GiB`.
+![exp1](./assets/Pi-Long-1.png)
+![exp2](./assets/Pi-Long-2.png)
+
+**2 - Experiments of GPU Memory Usage**
+
+<img src="./assets/Pi-Long-mem-1.png" width="45%" height="auto">
+<img src="./assets/Pi-Long-mem-2.png" width="45%" height="auto">
+
+
+
 
 `Pi-Long` **is not accompanied by a dedicated paper**. This repository is built on the [VGGT-Long](https://github.com/DengKaiCQ/VGGT-Long) and [Pi3](https://github.com/yyfz/Pi3). So if you need the technical details of `Pi-Long`, please refer to the following two papers:
 
@@ -33,7 +42,7 @@ As can be seen from the experiments, `Pi-Long`, implemented based on `Pi3`, exhi
 
 ### **Updates**
 
-`[26 Nov 2025]` Changes in repo of `VGGT-Long` are synced to this repo. Including speed-up, you can also choose in the config file to store the intermediate results in the CPU memory, which will result in faster speed (but please ensure there is sufficient CPU memory). 
+`[16 Apr 2026]` 1. The Pi3X model was supported; 2. Pi-Long now achieves a running speed of ~18 FPS on KITTI (504x154), by integrating the GPU-accelerated code from DA3-Streaming. 3. Bugs fixed; 4. Readme with detailed experiments.
 
 `[06 Nov 2025]` Demo video of `Pi-Long` uploaded.
 
@@ -151,7 +160,9 @@ python pi_long.py --image_dir ./path_of_images
 or
 
 ```cmd
-python pi_long.py --image_dir ./path_of_images --config ./configs/base_config.yaml
+python pi_long.py --image_dir ./path_of_images \ 
+        --config ./configs/base_config.yaml \
+        --exp_folder_name ./my_exp_name
 ```
 
 You may run the following cmd if you got videos before `python pi_long.py`.

@@ -21,10 +21,16 @@ rm ORBvoc.txt.tar.gz
 # Pi3 (~ 3.8 GiB)
 echo "Downloading Pi3 weights..."
 Pi3_URL="https://huggingface.co/yyfz233/Pi3/resolve/main/model.safetensors"
-curl -L "$Pi3_URL" -o "./model.safetensors"
+curl -L "$Pi3_URL" -o "./pi3.safetensors"
 
-# you will see 4 files under `./weights` when finished
-# - model.safetensors
+# Pi3X (~ 5.2 GiB)
+echo "Downloading Pi3 weights..."
+Pi3_URL="https://huggingface.co/yyfz233/Pi3X/resolve/main/model.safetensors"
+curl -L "$Pi3_URL" -o "./pi3X.safetensors"
+
+# you will see 5 files under `./weights` when finished
+# - pi3.safetensors
+# - pi3X.safetensors
 # - dino_salad.ckpt             
 # - dinov2_vitb14_pretrain.pth  
 # - ORBvoc.txt
