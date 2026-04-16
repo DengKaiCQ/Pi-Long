@@ -108,12 +108,15 @@ class Pi_Long:
 
         print('Loading model...')
 
-        if self.model_type == 'pi3':
+        if self.model_type == 'Pi3' or self.model_type == 'pi3':
             self.model = Pi3().to(self.device).eval()
-            _URL = self.config['Weights']['pi3']
-        else:
+            _URL = self.config['Weights']['Pi3']
+        elif self.model_type == 'Pi3X' or self.model_type == 'Pi3x' or self.model_type == 'pi3x' or self.model_type == 'pi3X':
             self.model = Pi3X().to(self.device).eval()
             _URL = self.config['Weights']['Pi3X']
+        else:
+            print(f'Unsupported Model Type: {self.model_type}')
+            sys.exit(-1)
         from safetensors.torch import load_file
         weight = load_file(_URL)
         self.model.load_state_dict(weight, strict=False)
