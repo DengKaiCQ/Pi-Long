@@ -69,7 +69,7 @@ class LongSeqResult:
         self.all_camera_poses = []
 
 class Pi_Long:
-    def __init__(self, image_dir, save_dir, config):
+    def __init__(self, image_dir, save_dir, config, cond_file=None):
         self.config = config
 
         self.chunk_size = self.config['Model']['chunk_size']
@@ -82,6 +82,18 @@ class Pi_Long:
         self.useDBoW = self.config['Model']['useDBoW']
         self.model_type = self.config['Model']['model_type']
         self.image_width = self.config['Model']['image_width']
+
+        # Optional intrinsics+pose conditioning (uses Pi3X multimodal inputs).
+        # When cond_file is None, behavior is unchanged.
+        self.cond = None
+        if cond_file:
+            import json as _json, numpy as _np
+            _c = _json.load(open(cond_file))
+            self.cond = {
+                'K': _np.array(_c['intrinsics'], dtype=_np.float32),
+                'poses': {k: _np.array(v, dtype=_np.float32) for k, v in _c['poses'].items()},
+            }
+            print(f'[COND] loaded intrinsics + {len(self.cond["poses"])} poses from {cond_file}')
         
         self.img_dir = image_dir
         self.img_list = None
@@ -201,9 +213,26 @@ class Pi_Long:
         assert images.shape[1] == 3
 
         torch.cuda.empty_cache()
+        model_kwargs = {}
+        if self.cond is not None:
+            names = [os.path.basename(p) for p in chunk_image_paths]
+            n = len(names)
+            K = torch.from_numpy(self.cond['K']).to(self.device)
+            intr = K[None, None].repeat(1, n, 1, 1)
+            c2w = torch.from_numpy(np.stack([self.cond['poses'][nm] for nm in names])).to(self.device)
+            # Pose is used only as a prior (relativized + scale-normalized inside
+            # the model); chunk stitching still relies on the predicted outputs.
+            model_kwargs = dict(
+                intrinsics=intr,
+                poses=c2w[None],
+                mask_add_ray=torch.ones(1, n, dtype=torch.bool, device=self.device),
+                mask_add_pose=torch.ones(1, n, dtype=torch.bool, device=self.device),
+                with_prior=True,
+            )
+            print(f'[COND] injecting intrinsics+pose for {n} frames')
         with torch.no_grad():
             with torch.cuda.amp.autocast(dtype=self.dtype):
-                predictions = self.model(images[None])
+                predictions = self.model(images[None], **model_kwargs)
         predictions['images'] = images[None]
 
         # see issue https://github.com/yyfz/Pi3/issues/55
@@ -672,6 +701,9 @@ if __name__ == '__main__':
                         help='Image path')
     parser.add_argument('--exp_folder_name', type=str, default='./exps',
                         help='Image path')
+    parser.add_argument('--cond', type=str, default=None,
+                        help='Optional JSON with camera intrinsics + per-frame c2w '
+                             'poses to condition the model (see README).')
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -698,7 +730,7 @@ if __name__ == '__main__':
     if config['Model']['align_method'] == 'numba':
         warmup_numba()
 
-    pi_long = Pi_Long(image_dir, save_dir, config)
+    pi_long = Pi_Long(image_dir, save_dir, config, cond_file=args.cond)
     pi_long.run()
     pi_long.close()
 
